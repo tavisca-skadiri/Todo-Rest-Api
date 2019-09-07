@@ -12,55 +12,55 @@ import java.util.List;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TodoController {
-    private List<String> todoList = new ArrayList<>();
+    private List<String> todos = new ArrayList<>();
 
-    @GetMapping(path = "/todoList")
-    public ResponseEntity<?> getTodoList() {
-        return sendResponse("All todoList retrieved");
+    @GetMapping(path = "/todos")
+    public ResponseEntity<?> getTodos() {
+        return sendResponse("All todos retrieved");
     }
 
-    @GetMapping(path = "/todoList/{id}")
-    public ResponseEntity<?> getTodo(@PathVariable("id") int todoId) {
-        if (todoId >= todoList.size())
+    @GetMapping(path = "/todos/{id}")
+    public ResponseEntity<?> getTodo(@PathVariable("id") int todoid) {
+        if (todoid >= todos.size())
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
         JSONObject jsonResponse = new JSONObject()
-                .put("todoName", todoList.get(todoId))
-                .put("status", "Todo " + (todoId + 1) + " retrieved")
+                .put("todoname", todos.get(todoid))
+                .put("status", "Todo " + (todoid + 1) + " retrieved")
                 .put("timestamp", Instant.now().toString());
         return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/todoList")
+    @PostMapping(path = "/todos")
     public ResponseEntity<?> addTodo(@RequestBody String json) {
-        JSONObject jsonRequest = new JSONObject(json);
-        String todoName = jsonRequest.getString("todoname");
-        todoList.add(todoName);
-        return sendResponse("Todo " + todoName + " Added");
+        JSONObject obj = new JSONObject(json);
+        String todoname = obj.getString("todoname");
+        todos.add(todoname);
+        return sendResponse("Todo " + todoname + " Added");
     }
 
-    @PutMapping(path = "/todoList/{id}")
-    public ResponseEntity<?> updateTodo(@PathVariable("id") int todoId, @RequestBody String json) {
-        if (todoId >= todoList.size())
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+    @PutMapping(path = "/todos/{id}")
+    public ResponseEntity<?> updateTodo(@PathVariable("id") int todoid, @RequestBody String json) {
         JSONObject jsonObject = new JSONObject(json);
-        String todoName = jsonObject.getString("todoname");
-        todoList.set(todoId, todoName);
-        return sendResponse("Todo-" + (todoId + 1) + " Updated");
+        if (todoid >= todos.size())
+            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
+        String todoname = jsonObject.getString("todoname");
+        todos.set(todoid, todoname);
+        return sendResponse("Todo-" + (todoid + 1) + " Updated");
     }
 
-    @DeleteMapping(path = "/todoList/{id}")
-    public ResponseEntity<?> deleteTodo(@PathVariable("id") int todoId) {
-        if (todoId >= todoList.size())
+    @DeleteMapping(path = "/todos/{id}")
+    public ResponseEntity<?> deleteTodo(@PathVariable("id") int todoid) {
+        if (todoid >= todos.size())
             return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
-        todoList.remove(todoId);
-        return sendResponse("Todo-" + (todoId + 1) + " Deleted");
+        todos.remove(todoid);
+        return sendResponse("Todo-" + (todoid + 1) + " Deleted");
     }
 
     private ResponseEntity<?> sendResponse(String status) {
-        JSONObject jsonResponse = new JSONObject();
-        jsonResponse.put("todoList", todoList);
-        jsonResponse.put("status", status);
-        jsonResponse.put("timestamp", Instant.now().toString());
+        JSONObject jsonResponse = new JSONObject()
+                .put("todos", todos)
+                .put("status", status)
+                .put("timestamp", Instant.now().toString());
         return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
     }
 }
