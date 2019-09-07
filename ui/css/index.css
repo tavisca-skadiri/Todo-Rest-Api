@@ -1,0 +1,104 @@
+body{
+  margin: 0;
+  background-color: lightgray;
+}
+.navbar ul{
+  list-style-type: none; 
+  background-color: #6b5d96;
+  padding-right: 20px;
+  padding: 10px;
+  margin: 0;
+}
+.navbar a{
+  font-size: 30px;
+  text-decoration: none;
+  color: white;
+}
+.navbar li{
+  display: inline;
+  padding-left: 20px;
+}
+.navbar a:hover {
+  color: lavender;
+}
+.logo{
+  color: pink;
+  padding-right: 30px;
+}
+.hidden{
+  display: none;
+}
+.tabs ul{
+  padding: 0px;
+  margin: 0px;
+  display: block;
+  list-style-type: none;
+  float: left;
+  width: 180px;
+}
+.tabs{
+  margin-top: 20px;
+  margin-left: 20px;
+}
+.tabs li{
+  margin-bottom: 3px;
+  text-align: left;
+}
+.tabs li:hover a{
+  background-color: lavender;
+  color: black;
+}
+.tabs li a{
+  display: block;
+  font-size: 20px;
+  color: white;
+  text-decoration: none;
+  text-align: center;
+  padding: 4%;
+  border-radius: 9px;
+  background-color: #6b5d96;
+}
+.tabs div{
+   display: block;
+   background: #efefef;
+   float:left;
+   width:70%;
+   min-height: 400px;
+   padding: 30px;
+   margin-left: 20px;
+   border-radius: 10px;
+}
+.tabs div article{
+   color: #000;
+   font-size:18px;   
+}
+#todo-name{
+    float: right;
+}
+#todo button{
+  color: white;
+  border-radius: 7px;
+  background-color: #6b5d96;
+  width: 65px; 
+  float: right; 
+}
+#todo-list {
+  table-layout: fixed;
+}
+#todo-list td:nth-child(1) {  
+  width: 200px;
+}
+#todo-list td, th{
+  text-transform: uppercase;
+  color: #6b5d96;
+  padding: 5px;
+  overflow: hidden;
+}
+#todo-list input[type=button]{
+  color: white;
+  padding: 4%;
+  border-radius: 7px;
+  background-color: #6b5d96;
+  width: 65px;
+  overflow: hidden;
+}
