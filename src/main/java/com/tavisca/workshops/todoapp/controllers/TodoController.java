@@ -13,8 +13,6 @@ import java.util.List;
 public class TodoController {
     @Autowired
     TodoService todoService;
-    private List<String> todos = new ArrayList<>();
-
     @GetMapping(path = "/todos")
     public ResponseEntity<?> get() {
         return todoService.getTodos();
