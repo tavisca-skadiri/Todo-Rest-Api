@@ -1,6 +1,6 @@
 package com.tavisca.workshops.todoapp.services;
 
-import com.tavisca.workshops.todoapp.logs.TodoLogger;
+import com.tavisca.workshops.todoapp.controllers.TodoController;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 public class TodoService {
-    private static final Logger logger = LoggerFactory.getLogger(TodoLogger.class);
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
     private List<String> todos = new ArrayList<>();
 
     public ResponseEntity<?> getTodos() {
