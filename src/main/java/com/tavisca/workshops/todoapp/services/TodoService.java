@@ -1,6 +1,9 @@
 package com.tavisca.workshops.todoapp.services;
 
+import com.tavisca.workshops.todoapp.logs.TodoLogger;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,7 @@ import java.util.List;
 
 @Service
 public class TodoService {
+    private static final Logger logger = LoggerFactory.getLogger(TodoLogger.class);
     private List<String> todos = new ArrayList<>();
 
     public ResponseEntity<?> getTodos() {
@@ -24,6 +28,7 @@ public class TodoService {
                 .put("todoname", todos.get(todoid))
                 .put("status", "Todo " + (todoid + 1) + " retrieved")
                 .put("timestamp", Instant.now().toString());
+        logger.info("Todo " + (todoid + 1) + " retrieved");
         return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
     }
 
@@ -55,6 +60,7 @@ public class TodoService {
                 .put("todos", todos)
                 .put("status", status)
                 .put("timestamp", Instant.now().toString());
+        logger.info(status);
         return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
     }
 }
