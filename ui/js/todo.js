@@ -1,4 +1,5 @@
 let todoArray = [];
+var todoMap = new Map();
 
 function createDatalistOption(value){
 	let node = document.createElement('option');
@@ -21,26 +22,29 @@ function createTodoRow(value){
 	}
     let todo_list = document.getElementById('todo-list');
 	let new_row = todo_list.insertRow();
-    new_row.insertCell(0).appendChild(document.createTextNode(value)); 
-    new_row.insertCell(1).appendChild(editButton); 
-    new_row.insertCell(2).appendChild(deleteButton); 
+    new_row.insertCell(0).appendChild(document.createTextNode(value));
+    new_row.insertCell(1).appendChild(editButton);
+    new_row.insertCell(2).appendChild(deleteButton);
 }
 function getTodos(){
-	fetch('http://localhost:9090/todos/', { 
-		method: 'get' 
+	fetch('http://localhost:9090/todos/', {
+		method: 'get'
 	}).then(response => {
     	return response.json()
 	}).then(data => {
-	    todoArray = data.todos;
+		for(let j = 0;j<data.todos.length;j++){
+	        todoArray.push(data.todos[j].todoname);
+	        todoMap.set(data.todos[j].todoname,data.todos[j].todoid);
+	    }
 		for(let i=0;i<todoArray.length;i++){
      		createDatalistOption(todoArray[i]);
 			createTodoRow(todoArray[i])
         }
-	});   
+	});
 }
 function addTodo(){
     let todo_name = document.getElementById('todo-name').value;
-    if(todo_name == "")  
+    if(todo_name == "")
         alert("Enter a value to search");
     else{
 		let requestBody = { todoname : todo_name };
@@ -54,11 +58,11 @@ function addTodo(){
 		});
     }
 }
-function searchTodo(value) { 
+function searchTodo(value) {
     let table = document.getElementById('todo-list');
     let tr = table.getElementsByTagName('tr');
     let str = document.getElementById('todo-name').value.toUpperCase();
-    document.getElementById('todo-datalist').innerHTML = ''; 
+    document.getElementById('todo-datalist').innerHTML = '';
     for(let i=0; i<tr.length; i++) {
         let td = tr[i].getElementsByTagName("td")[0];
         if (td) {
@@ -67,7 +71,7 @@ function searchTodo(value) {
         }
     }
 	for (let i = 0; i<todoArray.length; i++)
-     	if(((todoArray[i].toLowerCase()).indexOf(value.toLowerCase()))>-1) 
+     	if(((todoArray[i].toLowerCase()).indexOf(value.toLowerCase()))>-1)
      		createDatalistOption(todoArray[i]);
 }
 function editTodo(todobtn){
@@ -75,8 +79,9 @@ function editTodo(todobtn){
     textbox.placeholder = "Edit todo name";
     textbox.type = "text";
     textbox.size = 10;
-    
+
     let todo_name = todobtn.parentNode.parentNode.getElementsByTagName('td')[0];
+    let prev_todo_name = todo_name.innerHTML;
     todo_name.innerHTML = '';
     todo_name.appendChild(textbox);
 
@@ -84,7 +89,8 @@ function editTodo(todobtn){
     todobtn.onclick = function(){
         let todo_list = document.getElementById('todo-list');
 		let requestBody = { todoname : textbox.value };
-    	let url = 'http://localhost:9090/todos/' + (todobtn.parentNode.parentNode.rowIndex-1);
+		let todo_id = todoMap.get(prev_todo_name);
+    	let url = 'http://localhost:9090/todos/' + todo_id;
 		fetch(url, {
 		 	method: 'put',
 		    body: JSON.stringify(requestBody)
@@ -93,18 +99,20 @@ function editTodo(todobtn){
 		}).then(data => {
 			todobtn.value = "Edit";
 	        let val = document.createTextNode(textbox.value);
-	        todo_name.appendChild(val); 
+	        todo_name.appendChild(val);
 	        todo_name.removeChild(textbox);
 	        todobtn.onclick = function() {
 	            editTodo(this);
 	        }
-		});   
+		});
     }
 }
 function deleteTodo(todobtn){
 	let todo_list = document.getElementById('todo-list');
 	let row_to_delete = todobtn.parentNode.parentNode;
-	let url = 'http://localhost:9090/todos/' + (row_to_delete.rowIndex-1);
+	let todo_name = row_to_delete.firstChild.innerHTML;
+	let todo_id = todoMap.get(todo_name);
+	let url = 'http://localhost:9090/todos/' + todo_id;
 	fetch(url, {
 	 	method: 'delete'
 	}).then(response => {

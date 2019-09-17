@@ -1,66 +1,46 @@
 package com.tavisca.workshops.todoapp.services;
 
-import com.tavisca.workshops.todoapp.controllers.TodoController;
+import com.tavisca.workshops.todoapp.model.Todo;
+import com.tavisca.workshops.todoapp.repository.TodoDao;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class TodoService {
-    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
-    private List<String> todos = new ArrayList<>();
+    @Autowired
+    private TodoDao todoDao;
 
-    public ResponseEntity<?> getTodos() {
-        return sendResponse("All Todos retrieved");
+    public JSONObject getTodos() {
+        List<Todo> todos = todoDao.selectAllTodos();
+        return new JSONObject().put("todos", todos).put("status", "OK");
     }
 
-    public ResponseEntity<?> getTodoById(int todoid) {
-        if (todoid >= todos.size())
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
-        JSONObject jsonResponse = new JSONObject()
-                .put("todoname", todos.get(todoid))
-                .put("status", "Todo " + (todoid + 1) + " retrieved")
-                .put("timestamp", Instant.now().toString());
-        logger.info("Todo " + (todoid + 1) + " retrieved");
-        return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
+    public JSONObject getTodoById(int todoId) {
+        Todo todo = todoDao.selectTodoById(todoId);
+        String status = (todo != null) ? "OK" : "400";
+        return new JSONObject().put("todo", todo).put("status", status);
     }
 
-    public ResponseEntity<?> addTodo(String json) {
-        JSONObject obj = new JSONObject(json);
-        String todoname = obj.getString("todoname");
-        todos.add(todoname);
-        return sendResponse("Todo " + todoname + " Added");
+    public JSONObject addTodo(String json) {
+        String todoName = new JSONObject(json).getString("todoname");
+        boolean isQuerySuccess = todoDao.insertTodo(todoName);
+        String status = (isQuerySuccess) ? "OK" : "500";
+        return new JSONObject().put("status", status);
     }
 
-    public ResponseEntity<?> updateTodo(int todoid, String json) {
-        JSONObject jsonObject = new JSONObject(json);
-        if (todoid >= todos.size())
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
-        String todoname = jsonObject.getString("todoname");
-        todos.set(todoid, todoname);
-        return sendResponse("Todo-" + (todoid + 1) + " Updated");
+    public JSONObject updateTodo(int todoId, String json) {
+        String todoName = new JSONObject(json).getString("todoname");
+        boolean isQuerySuccess = todoDao.updateTodoById(todoId, todoName);
+        String status = (isQuerySuccess) ? "OK" : "400";
+        return new JSONObject().put("status", status);
     }
 
-    public ResponseEntity<?> deleteTodo(int todoid) {
-        if (todoid >= todos.size())
-            return new ResponseEntity<>("", HttpStatus.BAD_REQUEST);
-        todos.remove(todoid);
-        return sendResponse("Todo-" + (todoid + 1) + " Deleted");
-    }
-
-    private ResponseEntity<?> sendResponse(String status) {
-        JSONObject jsonResponse = new JSONObject()
-                .put("todos", todos)
-                .put("status", status)
-                .put("timestamp", Instant.now().toString());
-        logger.info(status);
-        return new ResponseEntity<>(jsonResponse.toString(), HttpStatus.OK);
+    public JSONObject deleteTodo(int todoId) {
+        boolean isQuerySuccess = todoDao.deleteTodoById(todoId);
+        String status = (isQuerySuccess) ? "OK" : "400";
+        return new JSONObject().put("status", status);
     }
 }

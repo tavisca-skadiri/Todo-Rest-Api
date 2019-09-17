@@ -1,49 +1,50 @@
 package com.tavisca.workshops.todoapp.controllers;
 
 import com.tavisca.workshops.todoapp.services.TodoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class TodoController {
-    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
-
     @Autowired
-    TodoService todoService;
+    private TodoService todoService;
 
     @GetMapping(path = "/todos")
-    public ResponseEntity<?> get() {
-        logger.info("GET Request - All Todos");
-        return todoService.getTodos();
+    public ResponseEntity<String> get() {
+        JSONObject jsonResponse = todoService.getTodos();
+        return sendResponse(jsonResponse);
     }
 
     @GetMapping(path = "/todos/{id}")
-    public ResponseEntity<?> getById(@PathVariable("id") int todoid) {
-        logger.info("GET Request - Get Todo No-" + (todoid+1));
-        return todoService.getTodoById(todoid);
+    public ResponseEntity<?> getById(@PathVariable("id") int todoId) {
+        JSONObject jsonResponse = todoService.getTodoById(todoId);
+        return sendResponse(jsonResponse);
     }
 
     @PostMapping(path = "/todos")
-    public ResponseEntity<?> add(@RequestBody String json) {
-        logger.info("POST Request - Add new Todo");
-        logger.info("Request Body - " + json);
-        return todoService.addTodo(json);
+    public ResponseEntity<String> add(@RequestBody String jsonRequest) {
+        JSONObject jsonResponse = todoService.addTodo(jsonRequest);
+        return sendResponse(jsonResponse);
     }
 
     @PutMapping(path = "/todos/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") int todoid, @RequestBody String json) {
-        logger.info("PUT Request - Update Todo No-" + (todoid+1));
-        logger.info("Request Body - " + json);
-        return todoService.updateTodo(todoid, json);
+    public ResponseEntity<?> update(@PathVariable("id") int todoId, @RequestBody String jsonRequest) {
+        JSONObject jsonResponse = todoService.updateTodo(todoId, jsonRequest);
+        return sendResponse(jsonResponse);
     }
 
     @DeleteMapping(path = "/todos/{id}")
-    public ResponseEntity<?> deleteTodo(@PathVariable("id") int todoid) {
-        logger.info("DELETE Request - Delete Todo No-" + (todoid+1));
-        return todoService.deleteTodo(todoid);
+    public ResponseEntity<?> deleteTodo(@PathVariable("id") int todoId) {
+        JSONObject jsonResponse = todoService.deleteTodo(todoId);
+        return sendResponse(jsonResponse);
+    }
+
+    private ResponseEntity<String> sendResponse(JSONObject jsonResponse) {
+        HttpStatus httpStatus = jsonResponse.get("status").equals("OK") ? HttpStatus.OK : HttpStatus.BAD_REQUEST;
+        return new ResponseEntity<>(jsonResponse.toString(), httpStatus);
     }
 }
